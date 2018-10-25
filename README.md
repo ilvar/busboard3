@@ -12,3 +12,4 @@ Small town transport app
 * stop detail page
 * favourite
 * block
+* pull to refresh

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BusBoard - Realtime Information</string>
+    <string name="title_stop_detail">Stop Detail</string>
+    <string name="time_in">in %s min</string>
+</resources>

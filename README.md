@@ -12,3 +12,5 @@ Small town transport app
 * stop detail page
 * favourite
 * block
+* pull to refresh
+* do not download all stops if there  is recent data + store last update timestamp

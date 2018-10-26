@@ -29,7 +29,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/text_margin"
-                        android:textAppearance="?attr/textAppearanceListItem"/>
+                        android:textAppearance="?attr/textAppearanceListItem" android:layout_gravity="start"/>
+                <Space
+                        android:layout_height="wrap_content" android:layout_weight="1"
+                        android:layout_width="wrap_content"/>
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" app:srcCompat="@drawable/ic_favorite_black_24dp"
+                        android:id="@+id/iconFav" android:layout_weight="1"
+                        android:layout_gravity="end" android:scaleType="fitEnd" android:adjustViewBounds="false"
+                        android:cropToPadding="false" android:contentDescription="fav"/>
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" app:srcCompat="@drawable/ic_block_black_24dp"
+                        android:id="@+id/iconBlock" android:layout_weight="1"
+                        android:layout_gravity="end" android:scaleType="fitEnd" android:adjustViewBounds="false"
+                        android:cropToPadding="false" android:contentDescription="fav"/>
+
             </LinearLayout>
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/timesRecycler"

@@ -46,10 +46,10 @@ data class Stop(
     val times: List<StopTime>? = null,
 
     @ColumnInfo
-    val favourite: Boolean = false,
+    var favourite: Boolean = false,
 
     @ColumnInfo
-    val blocked: Boolean = false,
+    var blocked: Boolean = false,
 
     @PrimaryKey
     val id: String = "${type}_${code}"
@@ -106,6 +106,9 @@ interface StopDao {
 
     @Query("SELECT * FROM stops WHERE id = :id")
     fun getStopById(id: String): Stop
+
+    @Query("SELECT * FROM stops WHERE type = :type AND code = :code")
+    fun getStopByTypeCode(type: String, code: String): Stop
 }
 
 

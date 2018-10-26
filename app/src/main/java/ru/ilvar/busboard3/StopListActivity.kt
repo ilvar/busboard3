@@ -22,8 +22,10 @@ import kotlinx.android.synthetic.main.stop_list.*
 import ru.ilvar.busboard3.apis.RailDataGetter
 import java.util.*
 import android.content.pm.PackageManager
+import android.media.Image
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.widget.ImageView
 import ru.ilvar.busboard3.apis.BusDataGetter
 import ru.ilvar.busboard3.apis.LuasDataGetter
 import ru.ilvar.busboard3.updaters.BusTimesUpdater
@@ -66,9 +68,9 @@ class StopListActivity : AppCompatActivity() {
         this.stopsDao = StopDatabase.getInstance(applicationContext).stopDao()
 
         System.err.println("getAllStations...")
-        RailDataGetter().getAllStations(this.stopsDao!!)
-        LuasDataGetter().getAllStations(this.stopsDao!!)
-        BusDataGetter().getAllStations(this.stopsDao!!)
+//        RailDataGetter().getAllStations(this.stopsDao!!)
+//        LuasDataGetter().getAllStations(this.stopsDao!!)
+//        BusDataGetter().getAllStations(this.stopsDao!!)
         System.err.println("getAllStations... started")
 
         // Acquire a reference to the system Location Manager
@@ -106,13 +108,11 @@ class StopListActivity : AppCompatActivity() {
                             it.coords.distanceFromLocation(location)
                         }
 
-                        val unblockedStops = sortedStops.filter { !it.blocked }
-                        val favedStops = sortedStops.sortedBy { if (it.favourite) { 1 } else { 2 } }
-                        val favedStopsOffset = favedStops.filter { it.favourite }.size
+                        val unblockedStops = sortedStops.sortedBy { if (it.blocked) { 2 } else { 1 } }
+                        val favedStops = unblockedStops.sortedBy { if (it.favourite) { 1 } else { 2 } }
 
-
-                        activity.stops = sortedStops.slice(IntRange(0, favedStopsOffset + 5))
-                        val stopAdapter = SimpleItemRecyclerViewAdapter(activity.stops!!, getString(R.string.time_in))
+                        activity.stops = favedStops
+                        val stopAdapter = SimpleItemRecyclerViewAdapter(activity.stops!!)
                         stop_list.setAdapter(stopAdapter)
                     }
                 })
@@ -132,7 +132,7 @@ class StopListActivity : AppCompatActivity() {
 
         val timerTask = StopsTimerTask(this)
         val timer = Timer(true)
-        timer.scheduleAtFixedRate(timerTask, 0, 10 * 1000)
+        timer.scheduleAtFixedRate(timerTask, 0, 60 * 1000)
 
         this.updateTimes()
     }
@@ -171,10 +171,7 @@ class StopListActivity : AppCompatActivity() {
         }
     }
 
-    class SimpleItemRecyclerViewAdapter(
-        private val values: List<Stop>,
-        private val timeString: String?
-    ) :
+    class SimpleItemRecyclerViewAdapter(private val values: List<Stop>) :
         RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
         private val onClickListener: View.OnClickListener
@@ -183,7 +180,8 @@ class StopListActivity : AppCompatActivity() {
             onClickListener = View.OnClickListener { v ->
                 val item = v.tag as Stop
                 val intent = Intent(v.context, StopDetailActivity::class.java).apply {
-                    putExtra(StopDetailFragment.ARG_ITEM_ID, item.id)
+                    putExtra(StopDetailFragment.ARG_ITEM_TYPE, item.type.type)
+                    putExtra(StopDetailFragment.ARG_ITEM_CODE, item.code)
                 }
                 v.context.startActivity(intent)
             }
@@ -198,7 +196,9 @@ class StopListActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
             holder.contentView.text = item.name
-            holder.timesRecycler.adapter = StopTimeRecyclerViewAdapter(item.times, timeString)
+            holder.iconFav.visibility = if (item.favourite) { ImageView.VISIBLE } else { ImageView.INVISIBLE }
+            holder.iconBlock.visibility = if (item.blocked) { ImageView.VISIBLE } else { ImageView.INVISIBLE }
+            holder.timesRecycler.adapter = StopTimeRecyclerViewAdapter(item.times)
 
             with(holder.itemView) {
                 tag = item
@@ -210,14 +210,13 @@ class StopListActivity : AppCompatActivity() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val contentView: TextView = view.content
+            val iconFav: ImageView = view.iconFav
+            val iconBlock: ImageView = view.iconBlock
             val timesRecycler: RecyclerView = view.timesRecycler
         }
     }
 
-    class StopTimeRecyclerViewAdapter(
-        private val values: List<StopTime>?,
-        private val timeString: String?
-    ) :
+    internal class StopTimeRecyclerViewAdapter(private val values: List<StopTime>?) :
         RecyclerView.Adapter<StopTimeRecyclerViewAdapter.ViewHolder>() {
 
         var pt = PrettyTime()

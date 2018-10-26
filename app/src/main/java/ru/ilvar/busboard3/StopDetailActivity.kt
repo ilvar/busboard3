@@ -21,11 +21,6 @@ class StopDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_stop_detail)
         setSupportActionBar(detail_toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
-
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -44,8 +39,12 @@ class StopDetailActivity : AppCompatActivity() {
             val fragment = StopDetailFragment().apply {
                 arguments = Bundle().apply {
                     putString(
-                        StopDetailFragment.ARG_ITEM_ID,
-                        intent.getStringExtra(StopDetailFragment.ARG_ITEM_ID)
+                        StopDetailFragment.ARG_ITEM_TYPE,
+                        intent.getStringExtra(StopDetailFragment.ARG_ITEM_TYPE)
+                    )
+                    putString(
+                        StopDetailFragment.ARG_ITEM_CODE,
+                        intent.getStringExtra(StopDetailFragment.ARG_ITEM_CODE)
                     )
                 }
             }

@@ -1,10 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/stop_detail"
-          style="?android:attr/textAppearanceLarge"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:padding="16dp"
-          android:textIsSelectable="true"
-          tools:context=".StopDetailFragment"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_height="wrap_content"
+              android:layout_width="match_parent"
+              android:orientation="vertical">
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/stop_detail"
+              style="?android:attr/textAppearanceLarge"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="16dp"
+              android:textIsSelectable="true"
+              tools:context=".StopDetailFragment"/>
+
+    <Button
+            android:text="Favourite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/button_favourite"
+            android:backgroundTint="@color/colorPrimary"/>
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/timesRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="LinearLayoutManager"
+            tools:context=".StopDetailFragment"
+            tools:listitem="@layout/stop_list_time">
+    </android.support.v7.widget.RecyclerView>
+    <Button
+            android:text="Block"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/button_block"
+            android:backgroundTint="@color/colorAccent"/>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+                android:text="Routes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/textView"/>
+        <CheckBox
+                android:text="67"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/checkBox_route"/>
+    </LinearLayout>
+</LinearLayout>

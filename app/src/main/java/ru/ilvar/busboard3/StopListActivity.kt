@@ -29,6 +29,9 @@ import ru.ilvar.busboard3.apis.LuasDataGetter
 import ru.ilvar.busboard3.updaters.BusTimesUpdater
 import ru.ilvar.busboard3.updaters.LuasTimesUpdater
 import ru.ilvar.busboard3.updaters.RailTimesUpdater
+import org.ocpsoft.prettytime.PrettyTime
+
+
 
 
 /**
@@ -62,9 +65,11 @@ class StopListActivity : AppCompatActivity() {
 
         this.stopsDao = StopDatabase.getInstance(applicationContext).stopDao()
 
+        System.err.println("getAllStations...")
         RailDataGetter().getAllStations(this.stopsDao!!)
         LuasDataGetter().getAllStations(this.stopsDao!!)
         BusDataGetter().getAllStations(this.stopsDao!!)
+        System.err.println("getAllStations... started")
 
         // Acquire a reference to the system Location Manager
         this.locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -80,9 +85,12 @@ class StopListActivity : AppCompatActivity() {
             }
 
             override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
+                System.err.println("onStatusChanged...")
             }
 
             override fun onLocationChanged(location: Location) {
+                System.err.println("Processing location ${location}...")
+
                 val distanceKms = 2.0
                 val latDiff = distanceKms / 110
                 val lngDiff = kotlin.math.abs(distanceKms / 111 / kotlin.math.cos(location.latitude))
@@ -94,7 +102,16 @@ class StopListActivity : AppCompatActivity() {
                     location.longitude + lngDiff
                 ).observe(activity, Observer<List<Stop>> { stops: List<Stop>? ->
                     if (stops != null) {
-                        activity.stops = stops
+                        val sortedStops = stops.sortedBy {
+                            it.coords.distanceFromLocation(location)
+                        }
+
+                        val unblockedStops = sortedStops.filter { !it.blocked }
+                        val favedStops = sortedStops.sortedBy { if (it.favourite) { 1 } else { 2 } }
+                        val favedStopsOffset = favedStops.filter { it.favourite }.size
+
+
+                        activity.stops = sortedStops.slice(IntRange(0, favedStopsOffset + 5))
                         val stopAdapter = SimpleItemRecyclerViewAdapter(activity.stops!!, getString(R.string.time_in))
                         stop_list.setAdapter(stopAdapter)
                     }
@@ -203,6 +220,8 @@ class StopListActivity : AppCompatActivity() {
     ) :
         RecyclerView.Adapter<StopTimeRecyclerViewAdapter.ViewHolder>() {
 
+        var pt = PrettyTime()
+
         init {}
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -216,8 +235,7 @@ class StopListActivity : AppCompatActivity() {
                 val item = values[position]
                 holder.timeView.text = item.time.toString().split(" ")[3].substringBeforeLast(':')
 
-                val timeDiff = (item.time.getTime() - Date().getTime()) / 1000 / 60
-                holder.timeToView.text = String.format(timeString!!, timeDiff)
+                holder.timeToView.text = "in " + pt.format(item.time).replace(" from now", "")
 
                 holder.route.text = item.route
                 holder.dest.text = item.dest

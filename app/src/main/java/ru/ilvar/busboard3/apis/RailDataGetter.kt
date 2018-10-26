@@ -56,14 +56,15 @@ class RailDataGetter() {
         call.enqueue(object : Callback<RailResponse> {
             override fun onResponse(call: Call<RailResponse>, response: Response<RailResponse>) {
                 val kk = response.body().stations
+                System.err.println("Rail response: ${kk?.size} stops")
                 kk!!.forEach {
                     stopsDao.addStop(it.asStop())
                 }
-
+                System.err.println("Rail response processed")
             }
 
             override fun onFailure(call: Call<RailResponse>, t: Throwable) {
-                println(t.localizedMessage)
+                System.err.println(t.localizedMessage)
             }
         })
     }

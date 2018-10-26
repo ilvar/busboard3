@@ -9,6 +9,7 @@ import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.TypeConverters
 import android.arch.persistence.room.Database
 import android.content.Context
+import android.location.Location
 
 
 enum class StopType(val type: String) {
@@ -17,7 +18,13 @@ enum class StopType(val type: String) {
     TRAIN("train")
 }
 
-data class Coords (val lat: Double, val lng: Double)
+data class Coords (val lat: Double, val lng: Double) {
+    fun distanceFromLocation(l: Location): Double {
+        val sqLat = Math.pow(((this.lat - l.latitude) * 110), 2.0)
+        val sqLng = Math.pow(((this.lng - l.longitude) * Math.cos(l.latitude) * 111), 2.0)
+        return Math.sqrt(sqLat + sqLng)
+    }
+}
 
 data class StopTime(val time: Date, val route: String, val dest: String)
 
